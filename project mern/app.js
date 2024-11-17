@@ -2,12 +2,15 @@ const express=require("express");
 const app=express();
 const mongoose = require("mongoose");
 const port=8080;
+const ejsMate=require("ejs-mate");
 const path=require("path");
 app.set("view engine","ejs");
+app.engine('ejs', ejsMate);
 app.set("views",path.join(__dirname,"/views"));
 app.use(express.urlencoded({extended: true}));
 const methodOverride = require("method-override");
 app.use(methodOverride("_method"));
+app.use(express.static(path.join(__dirname,"public")));
 async function main(){
     await mongoose.connect('mongodb://127.0.0.1:27017/wanderlust');
 }
@@ -75,9 +78,3 @@ app.delete("/listings/:id",async(req,res)=>{
   await  Listing.findByIdAndDelete(id);
     res.redirect("/listings")
 })
-
-
-
-
-
-
