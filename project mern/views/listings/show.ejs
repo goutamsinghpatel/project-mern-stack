@@ -8,7 +8,7 @@
     <div class="card col-6 offset-3 show-card" >
         <img src="<%=showListings.image%>" class="card-img-top show-image" alt="..<%=showListings.title%>">
         <div class="card-body">
-          <p class="card-text"> <b><%=showListings.title%></b> <br> <%=showListings.title%>  <br>   &#8377; <%=showListings.price.toLocaleString("en-IN")%>\Night <br><%=showListings.location%> <br> <%=showListings.country%></p>
+          <p class="card-text"> <b><%=showListings.title%></b> <br> <%=showListings.title%>  <br>    &#8377; <%= showListings.price.toLocaleString("en-IN")%>/night <br><%=showListings.location%> <br> <%=showListings.country%></p>
   
         </div>
       </div>
@@ -21,10 +21,8 @@
             <button class="btn btn-secondary  offset-3">Delete</button>
         </form>
      </div>
-       
-      
-
 </div>
 <br>
 <br>
 </body>
+
