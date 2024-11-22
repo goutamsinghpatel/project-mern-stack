@@ -3,6 +3,8 @@ const app=express();
 const mongoose = require("mongoose");
 const port=8080;
 const ejsMate=require("ejs-mate");
+const wrapAsync=require("./utils/wrapasyn.js")
+const expressError=require("./utils/expressError.js");
 const path=require("path");
 app.set("view engine","ejs");
 app.engine('ejs', ejsMate);
@@ -30,51 +32,74 @@ app.listen(port,()=>{
 
 // index route///
 
-app.get("/listings",async(req,res)=>{
+app.get("/listings",wrapAsync( async(req,res)=>{
   const allListings= await Listing.find({});
 
 res.render("listings/index.ejs",{allListings});
 
-})
+}))
 
 //new route//
 app.get("/listings/new",(req,res)=>{
     res.render("listings/new.ejs");
 })
 //create route//
-app.post("/listings/create",async(req,res)=>{
+app.post("/listings/create",wrapAsync( async(req,res,next)=>{
     // let {title,decription,country,price,location,image}=req.body;
+if(! req.body.Listing){
+    throw new expressError(400,"send valid data for listings")
+}
+   
     let newListing=new Listing(req.body.Listing);
-await newListing.save();
- res.redirect("/listings");
-})
+    await newListing.save();
+     res.redirect("/listings");
+   
+  
+}))
+   
+
 
 
 //show route//
 
-app.get("/listings/:id",async(req,res)=>{
-let {id}=req.params;
+app.get("/listings/:id",wrapAsync(async(req,res)=>{
+
+    let {id}=req.params;
 let showListings=await Listing.findById(id);
 
 res.render("listings/show.ejs",{showListings});
-})
+}))
 // edit route//
-app.get("/listings/:id/edit",async(req,res)=>{
+app.get("/listings/:id/edit",wrapAsync(async(req,res)=>{
 let {id}=req.params;
 let showListings=await Listing.findById(id);
 res.render("listings/edit.ejs",{showListings});
 
-})
+}))
 //update route//
-app.patch("/listings/:id",async(req,res)=>{
+app.patch("/listings/:id",wrapAsync(async(req,res)=>{
     let {id}=req.params;
+    if(! req.body.Listing){
+        throw new expressError(400,"send valid data for listings")
+    }
+       
  await Listing.findByIdAndUpdate(id,{...req.body.Listing})
  res.redirect("/listings")
+}))
+app.all("*",(req,res,next)=>{
+    next(new expressError(400,"page not found"));
 })
 
 //Delete route//
-app.delete("/listings/:id",async(req,res)=>{
+app.delete("/listings/:id",wrapAsync(async(req,res)=>{
     let {id}=req.params;
   await  Listing.findByIdAndDelete(id);
     res.redirect("/listings")
+}))
+//midlewarer//
+app.use((err,req,res,next)=>{
+    
+    let{status=500,message=not}=err;
+    res.status(status).send(message);
+    
 })
