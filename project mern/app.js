@@ -86,9 +86,7 @@ app.patch("/listings/:id",wrapAsync(async(req,res)=>{
  await Listing.findByIdAndUpdate(id,{...req.body.Listing})
  res.redirect("/listings")
 }))
-app.all("*",(req,res,next)=>{
-    next(new expressError(400,"page not found"));
-})
+
 
 //Delete route//
 app.delete("/listings/:id",wrapAsync(async(req,res)=>{
@@ -96,10 +94,15 @@ app.delete("/listings/:id",wrapAsync(async(req,res)=>{
   await  Listing.findByIdAndDelete(id);
     res.redirect("/listings")
 }))
-//midlewarer//
+// midlewarer//
 app.use((err,req,res,next)=>{
     
     let{status=500,message=not}=err;
+    res.status(status).render("listings/error.ejs",{message})
+
     res.status(status).send(message);
     
+})
+app.all("*",(req,res,next)=>{
+    next(new expressError(400,"page not found"));
 })
