@@ -5,6 +5,7 @@ const port=8080;
 const ejsMate=require("ejs-mate");
 const wrapAsync=require("./utils/wrapasyn.js")
 const expressError=require("./utils/expressError.js");
+const {listingSchema}=require("./schema.js");
 const path=require("path");
 app.set("view engine","ejs");
 app.engine('ejs', ejsMate);
@@ -43,18 +44,25 @@ res.render("listings/index.ejs",{allListings});
 app.get("/listings/new",(req,res)=>{
     res.render("listings/new.ejs");
 })
+
+//valid schema midleware//
+const validateListing = (req, res, next) => {
+    const { error } = listingSchema.validate(req.body); 
+    if (error) {
+
+        throw new expressError(400, error.details.map(el => el.message).join(', '));
+    } else {
+        next();
+    }
+};
 //create route//
-app.post("/listings/create",wrapAsync( async(req,res,next)=>{
+app.post("/listings/create",validateListing,wrapAsync( async(req,res,next)=>{
     // let {title,decription,country,price,location,image}=req.body;
-if(! req.body.Listing){
-    throw new expressError(400,"send valid data for listings")
-}
-   
-    let newListing=new Listing(req.body.Listing);
+
+let newListing=new Listing(req.body.Listing);
     await newListing.save();
      res.redirect("/listings");
-   
-  
+    
 }))
    
 
@@ -77,7 +85,7 @@ res.render("listings/edit.ejs",{showListings});
 
 }))
 //update route//
-app.patch("/listings/:id",wrapAsync(async(req,res)=>{
+app.patch("/listings/:id",validateListing,wrapAsync(async(req,res)=>{
     let {id}=req.params;
     if(! req.body.Listing){
         throw new expressError(400,"send valid data for listings")
@@ -103,6 +111,8 @@ app.use((err,req,res,next)=>{
     res.status(status).send(message);
     
 })
+
 app.all("*",(req,res,next)=>{
     next(new expressError(400,"page not found"));
 })
+
