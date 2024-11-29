@@ -25,6 +25,8 @@ main().then((data)=>{
 })
 //require modal//
 const Listing=require("./models/listing.js");
+const Review=require("./models/reviews.js");
+
 
 app.listen(port,()=>{
     console.log("server started")
@@ -102,6 +104,18 @@ app.delete("/listings/:id",wrapAsync(async(req,res)=>{
   await  Listing.findByIdAndDelete(id);
     res.redirect("/listings")
 }))
+//review route//
+app.post("/listings/:id/reviews",wrapAsync(async(req,res)=>{
+   
+  let listing =  await  Listing.findById(req.params.id);
+let newReview=new Review(req.body.review);
+
+listing.reviews.push(newReview);
+await newReview.save();
+await listing.save();
+console.log("save");
+res.redirect(`/listings/${listing._id}`);
+}))
 // midlewarer//
 app.use((err,req,res,next)=>{
     
@@ -112,7 +126,10 @@ app.use((err,req,res,next)=>{
     
 })
 
-app.all("*",(req,res,next)=>{
-    next(new expressError(400,"page not found"));
+// app.all("*",(req,res,next)=>{
+//     next(new expressError(400,"page not found"));
+// })
+app.use((req,res,next)=>{
+    res.send("page not found");
 })
 

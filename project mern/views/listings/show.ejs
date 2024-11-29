@@ -3,7 +3,7 @@
   
   <div class="row mt-3">
 <div class="col-8 offset-3">
-    <h3>Listing Details:</h3>
+    <h3><%=showListings.title%>:</h3>
   </div>
     <div class="card col-6 offset-3 show-card" >
         <img src="<%=showListings.image%>" class="card-img-top show-image" alt="..<%=showListings.title%>">
@@ -21,6 +21,30 @@
             <button class="btn btn-secondary  offset-3">Delete</button>
         </form>
      </div>
+     <!-- comment and rating  -->
+      <div class="col-8 offset-3">
+        <hr>
+
+   <h4> Leave a review: </h4>
+   <form method="post" class="col-8 offset-2 mb-3 mt-3"  action="/listings/<%=showListings._id%>/reviews" >
+    <!-- rating -->
+    <div class="mb-3 mt-3">
+      <label  class="form-label" for="rating">rating</label>
+      <input type="range"  class="form-range" min="1" max="5" id="rating" name="review[rating]">
+    </div>
+    <!-- comment -->
+ <div class="mb-3 mt-3">
+  <label class="form-label" for="comment">comment</label>
+  <textarea id="comment" class="form-control" name="review[comment]" rows="2" cols="30" ></textarea>
+ </div>
+ <!-- submit  -->
+  <br>
+ <div class="mb-3 mt-3">
+  <button class="btn btn-secondary ">Submit</button>
+ </div>
+   </form>
+
+      </div>
 </div>
 <br>
 <br>
