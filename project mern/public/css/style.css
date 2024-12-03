@@ -51,7 +51,7 @@ min-height: 100vh;
 }
 /* image add */
 
-.card{
+.listing-card{
     border:none !important;
     margin-bottom:2rem !important;
 
@@ -101,4 +101,4 @@ min-height: 100vh;
 .show-card{
     padding-left:0 ;
     padding-right: 0;
-}        
+}   
