@@ -9,7 +9,8 @@ const {listingSchema}=require("./schema.js");
 const {reviewSchema}=require("./schema.js");
 const listings=require("./routes/listing.js");
 const reviews=require("./routes/review.js");
-
+const session=require("express-session");
+const flash=require("connect-flash");
 const path=require("path");
 app.set("view engine","ejs");
 app.engine('ejs', ejsMate);
@@ -31,12 +32,27 @@ main().then((data)=>{
 const Listing=require("./models/listing.js");
 const Review=require("./models/reviews.js");
 
-
+const sessionOption={
+    secret:"mysupersecretcode",
+    resave:false,
+    saveUninitialized:true,
+    cookie:{
+        expires:Date.now()+30*24*60*60*1000,
+        maxAge:30*24*60*60*1000,
+        httpOnly:true,
+    }
+}
+app.use(session(sessionOption));
+app.use(flash());
 app.listen(port,()=>{
     console.log("server started")
 });
-
-
+//midlware to flash
+app.use((req,res,next)=>{
+    res.locals.success=req.flash("success");
+    res.locals.error=req.flash("error");
+    next();
+})
 app.use("/listings",listings)
 app.use("/listings/:id/reviews",reviews)
 
@@ -54,6 +70,7 @@ app.use((err,req,res,next)=>{
 // app.all("*",(req,res,next)=>{
 //     next(new expressError(400,"page not found"));
 // })
+
 app.use((req,res,next)=>{
     res.send("page not found");
 })
