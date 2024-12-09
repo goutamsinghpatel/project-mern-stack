@@ -12,7 +12,13 @@ const reviewSchema=new Schema({
         type:Date,
         defualt:Date.now(),
 
-    }
+    },
+    author:
+        {
+            type:Schema.Types.ObjectId,
+            ref:"User"
+        }
+    
 });
 
 
