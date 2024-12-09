@@ -7,10 +7,13 @@ const wrapAsync=require("./utils/wrapasyn.js")
 const expressError=require("./utils/expressError.js");
 const {listingSchema}=require("./schema.js");
 const {reviewSchema}=require("./schema.js");
-const listings=require("./routes/listing.js");
-const reviews=require("./routes/review.js");
+const listingRouter=require("./routes/listing.js");
+const reviewRouter=require("./routes/review.js");
+const userRouter=require("./routes/user.js");
 const session=require("express-session");
 const flash=require("connect-flash");
+const passport=require("passport");
+const LocalStrategy=require("passport-local");
 const path=require("path");
 app.set("view engine","ejs");
 app.engine('ejs', ejsMate);
@@ -31,6 +34,8 @@ main().then((data)=>{
 //require modal//
 const Listing=require("./models/listing.js");
 const Review=require("./models/reviews.js");
+const User=require("./models/user.js");
+//session id//
 
 const sessionOption={
     secret:"mysupersecretcode",
@@ -44,6 +49,15 @@ const sessionOption={
 }
 app.use(session(sessionOption));
 app.use(flash());
+//passport//
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(new LocalStrategy(User.authenticate()));
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+//port
 app.listen(port,()=>{
     console.log("server started")
 });
@@ -51,10 +65,15 @@ app.listen(port,()=>{
 app.use((req,res,next)=>{
     res.locals.success=req.flash("success");
     res.locals.error=req.flash("error");
+    res.locals.currUser=req.user;
     next();
 })
-app.use("/listings",listings)
-app.use("/listings/:id/reviews",reviews)
+
+// all routes//
+
+app.use("/listings",listingRouter)
+app.use("/listings/:id/reviews",reviewRouter)
+app.use("/",userRouter);
 
 
 // midlewarer//
@@ -67,9 +86,9 @@ app.use((err,req,res,next)=>{
     
 })
 
-// app.all("*",(req,res,next)=>{
+// app.all("*",wrapAsync((req,res,next)=>{
 //     next(new expressError(400,"page not found"));
-// })
+// }))
 
 app.use((req,res,next)=>{
     res.send("page not found");
