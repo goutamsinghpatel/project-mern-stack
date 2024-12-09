@@ -8,24 +8,33 @@
     <div class="card  listing-card col-6 offset-3 show-card" >
         <img src="<%=showListings.image%>" class="card-img-top show-image" alt="..<%=showListings.title%>">
         <div class="card-body">
-          <p class="card-text"> <b><%=showListings.title%></b> <br> <%=showListings.title%>  <br>    &#8377; <%= showListings.price.toLocaleString("en-IN")%>/night <br><%=showListings.location%> <br> <%=showListings.country%></p>
+          <p class="card-text"><i>owened by ::<%=showListings.owner.username%></i></p>  
+          <p class="card-text"><b><%=showListings.description%></p></b> 
+          <p class="card-text"> <%=showListings.title%></p>
+          <p class="card-text">   &#8377; <%= showListings.price.toLocaleString("en-IN")%>/night</p> 
+          <p class="card-text"><%=showListings.location%></p> 
+          <p class="card-text"> <%=showListings.country%></p>
+        
   
         </div>
       </div>
     
-         
-      <div class="btns ">
-        <a href="/listings/<%=showListings._id%>/edit" class="btn btn-dark col-2 offset-3 edit-btn">edit </a>
-       
-        <form method="post" action="/listings/<%=showListings._id%>?_method=DELETE">
-            <button class="btn btn-secondary  offset-3">Delete</button>
-        </form>
-     </div>
+        <%if(currUser && currUser._id.equals(showListings.owner._id)){%>
+          <div class="btns ">
+            <a href="/listings/<%=showListings._id%>/edit" class="btn btn-dark col-2 offset-3 edit-btn">edit </a>
+           
+            <form method="post" action="/listings/<%=showListings._id%>?_method=DELETE">
+                <button class="btn btn-secondary  offset-3">Delete</button>
+            </form>
+         </div>
+      <%  }%>
+
      <!-- comment and rating  -->
       <div class="col-8 offset-3">
         <hr>
-
+        <%if(currUser){%>
    <h4> Leave a review: </h4>
+
    <form method="post" class="col-8 offset-2 mb-3 mt-3 needs-validation "   novalidate action="/listings/<%=showListings._id%>/reviews" >
     <!-- rating -->
     <div class="mb-3 mt-3">
@@ -46,6 +55,8 @@
   <button class="btn edit-btn ">Submit</button>
  </div>
    </form>
+   <hr>
+   <%}%>
 
 <p><b>ALL review:</b></p>
 <div class="row">
@@ -55,13 +66,18 @@
   <div class="card col-5 ms-3 mb-3" style="width: 18rem;">
    <div class="card-body go ">
 
-    <h4 class="card-text">jane DOe </h4>
+    <h4 class="card-text">@<%=review.author.username%> </h4>
     <p class="card-text"><%=review.comment%></p>
     <p class="card-text"><%=review.rating%>STAR</p>
    </div>
-   <form method="post"  class="mb-3" action="/listings/<%=showListings._id%>/reviews/<%=review._id%>?_method=DELETE">
-<button class="btn  btn-sm btn-secondary  ">remove</button>
-   </form>
+   
+   <%if(currUser){%>
+    <form method="post"  class="mb-3" action="/listings/<%=showListings._id%>/reviews/<%=review._id%>?_method=DELETE">
+      <button class="btn  btn-sm btn-secondary  ">remove</button>
+         </form>
+    <%}%>
+
+   
   </div>
 
 <%}%>
